@@ -1,10 +1,9 @@
-// screens/BookDetailScreen.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
-import mockBooks from "../utils/mockBooks50";
+import { fetchBooks } from "../utils/mockBooks50"; // Use the named export
 import { useCart } from "../context/CartContext";
 
 type RouteProps = RouteProp<RootStackParamList, "BookDetail">;
@@ -15,11 +14,30 @@ type Props = {
   navigation: NavProps;
 };
 
+type Book = {
+  id: string;
+  isbn: string;
+  author: string;
+  price: number;
+  publisher: string;
+  remaining_quantity: number;
+  title: string;
+};
+
 const BookDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { bookId } = route.params;
   const { addToCart } = useCart();
+  const [book, setBook] = useState<Book | null>(null);
 
-  const book = mockBooks.find((b) => b.id === bookId);
+  useEffect(() => {
+    const loadBook = async () => {
+      const books = await fetchBooks(); // Fetch books from Firebase
+      const foundBook = books.find((b) => b.id === bookId);
+      setBook(foundBook || null);
+    };
+
+    loadBook();
+  }, [bookId]);
 
   if (!book) {
     return (
