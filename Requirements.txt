@@ -1,0 +1,15 @@
+Requirements
+1. Must have a signup and login page.
+2. The mock data should contain at least 50 books.
+3. The books data should contain author, publisher and ISBN (can be randomly
+generated). The price of each book can also be randomly generated.
+4. Users should be able to search for books by author, publisher or ISBN. The search
+result should also show how many of each book is left in stock.
+5. There is a shopping cart system.
+6. Users can add items to cart and checkout. The checkout system should show the
+total price of the books in the cart.
+7. There is no payment process.
+8. The amount of books left in stock should match with customers’ purchase. That is, if
+a user purchases book A, then the stock of book A should decrease by 1.
+9. There is no need for the admin system, such as changing the stock, editing the
+information of the books, or adding new books to the database.
