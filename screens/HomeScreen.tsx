@@ -1,5 +1,4 @@
-// screens/HomeScreen.tsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,7 +9,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
-import mockBooks from "../utils/mockBooks50";
+import { fetchBooks } from "../utils/mockBooks50";
 import BookItem from "../components/BookItem";
 import { useCart } from "../context/CartContext";
 
@@ -19,6 +18,16 @@ type HomeScreenNavigationProp = StackNavigationProp<
   "Home"
 >;
 
+type Book = {
+  id: string;
+  isbn: string;
+  author: string;
+  price: number;
+  publisher: string;
+  remaining_quantity: number;
+  title: string;
+};
+
 type Props = {
   navigation: HomeScreenNavigationProp;
 };
@@ -26,17 +35,27 @@ type Props = {
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const { addToCart, totalItems } = useCart();
   const [query, setQuery] = useState("");
+  const [books, setBooks] = useState<Book[]>([]);
+
+  useEffect(() => {
+    const loadBooks = async () => {
+      const fetchedBooks = await fetchBooks();
+      setBooks(fetchedBooks);
+    };
+
+    loadBooks();
+  }, []);
 
   const filteredBooks = useMemo(() => {
     const q = query.toLowerCase();
-    return mockBooks.filter(
+    return books.filter(
       (b) =>
         b.title.toLowerCase().includes(q) ||
         b.author.toLowerCase().includes(q) ||
         b.publisher.toLowerCase().includes(q) ||
         b.isbn.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, books]);
 
   return (
     <View style={styles.container}>
