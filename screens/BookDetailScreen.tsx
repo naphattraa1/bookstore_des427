@@ -1,65 +1,100 @@
+// screens/BookDetailScreen.tsx
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
-import { fetchBooks } from "../utils/mockBooks50"; // Use the named export
+import { fetchBooks } from "../utils/mockBooks50";
 import { useCart } from "../context/CartContext";
 
-type RouteProps = RouteProp<RootStackParamList, "BookDetail">;
-type NavProps = StackNavigationProp<RootStackParamList, "BookDetail">;
+// ----- types -----
+type BookDetailRouteProp = RouteProp<RootStackParamList, "BookDetail">;
+type BookDetailNavProp = StackNavigationProp<RootStackParamList, "BookDetail">;
 
 type Props = {
-  route: RouteProps;
-  navigation: NavProps;
+  route: BookDetailRouteProp;
+  navigation: BookDetailNavProp;
 };
 
 type Book = {
   id: string;
-  isbn: string;
   author: string;
+  isbn: string;
   price: number;
   publisher: string;
   remaining_quantity: number;
   title: string;
 };
 
-const BookDetailScreen: React.FC<Props> = ({ route, navigation }) => {
+// ----- component -----
+const BookDetailScreen: React.FC<Props> = ({ route }) => {
   const { bookId } = route.params;
   const { addToCart } = useCart();
+
   const [book, setBook] = useState<Book | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadBook = async () => {
-      const books = await fetchBooks(); // Fetch books from Firebase
-      const foundBook = books.find((b) => b.id === bookId);
-      setBook(foundBook || null);
+      try {
+        const allBooks = await fetchBooks();        // ✅ load from Firebase
+        const found = allBooks.find((b) => b.id === bookId);
+        setBook(found || null);
+      } catch (e) {
+        console.error("Error loading book detail:", e);
+        setBook(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadBook();
   }, [bookId]);
 
-  if (!book) {
+  if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Book not found.</Text>
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
 
-  const onAdd = () => {
-    addToCart(book);
-    navigation.navigate("Cart");
-  };
+  if (!book) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.notFound}>Book not found</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{book.title}</Text>
-      <Text style={styles.meta}>Author: {book.author}</Text>
-      <Text style={styles.meta}>Publisher: {book.publisher}</Text>
-      <Text style={styles.meta}>ISBN: {book.isbn}</Text>
-      <Text style={styles.price}>{book.price} THB</Text>
-      <Button title="Add to Cart" onPress={onAdd} />
+
+      <Text style={styles.label}>Author:</Text>
+      <Text style={styles.value}>{book.author}</Text>
+
+      <Text style={styles.label}>Publisher:</Text>
+      <Text style={styles.value}>{book.publisher}</Text>
+
+      <Text style={styles.label}>ISBN:</Text>
+      <Text style={styles.value}>{book.isbn}</Text>
+
+      <Text style={styles.label}>Price:</Text>
+      <Text style={styles.value}>{book.price} THB</Text>
+
+      <Text style={styles.label}>In stock:</Text>
+      <Text style={styles.value}>{book.remaining_quantity}</Text>
+
+      <View style={styles.buttonRow}>
+        <Button title="Add to cart" onPress={() => addToCart(book)} />
+      </View>
     </View>
   );
 };
@@ -67,16 +102,34 @@ const BookDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    padding: 16,
     backgroundColor: "#fff",
   },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 12 },
-  meta: { fontSize: 14, color: "#555", marginBottom: 4 },
-  price: {
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  notFound: {
     fontSize: 18,
+    fontWeight: "600",
+    color: "red",
+  },
+  title: {
+    fontSize: 22,
     fontWeight: "700",
-    color: "#2a7",
-    marginVertical: 16,
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 8,
+  },
+  value: {
+    fontSize: 16,
+  },
+  buttonRow: {
+    marginTop: 24,
   },
 });
 
