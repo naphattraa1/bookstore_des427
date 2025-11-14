@@ -4,9 +4,8 @@ import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
@@ -20,69 +19,151 @@ type Props = {
   navigation: SignupScreenNavigationProp;
 };
 
+const NAVY = "#1C3D6E";
+const CREAM = "#F7F2E8";
+
 const SignupScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const onSignup = () => {
-    // ยังไม่เชื่อม backend -> signup เสร็จให้กลับไป login
     navigation.replace("Login");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <Button title="Sign up" onPress={onSignup} />
+      <View style={styles.innerWrapper}>
+        {/* Title Section */}
+        <Text style={styles.appTitle}>Join Bookstore</Text>
+        <Text style={styles.subtitle}>Create your account ✨</Text>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </TouchableOpacity>
+        {/* Signup Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Sign Up</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#A4978B"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#A4978B"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity style={styles.signupButton} onPress={onSignup}>
+            <Text style={styles.signupText}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 16 }}
+          >
+            <Text style={styles.linkText}>
+              Already have an account?{" "}
+              <Text style={styles.linkStrong}>Login</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
 
+export default SignupScreen;
+
+// ---------------- STYLES ----------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: CREAM,
+    justifyContent: "center", // center vertically
+    alignItems: "center",     // center horizontally
+    paddingHorizontal: 24,
   },
-  title: {
-    fontSize: 24,
+
+  innerWrapper: {
+    width: "100%",
+    alignItems: "center",
+  },
+
+  appTitle: {
+    fontSize: 34,
     fontWeight: "700",
-    marginBottom: 24,
+    color: NAVY,
     textAlign: "center",
   },
+
+  subtitle: {
+    fontSize: 15,
+    color: "#6A6259",
+    marginBottom: 26,
+    textAlign: "center",
+  },
+
+  card: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    padding: 24,
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 3,
+  },
+
+  cardTitle: {
+    fontSize: 20,
+    color: NAVY,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 18,
+  },
+
   input: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
+    backgroundColor: "#FFF6ED",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#E3D6C6",
+    color: "#3A322B",
+    marginBottom: 14,
+    fontSize: 14,
   },
-  link: {
-    marginTop: 16,
+
+  signupButton: {
+    backgroundColor: NAVY,
+    paddingVertical: 14,
+    borderRadius: 999,
+    alignItems: "center",
+    marginTop: 4,
+  },
+
+  signupText: {
+    color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  linkText: {
     textAlign: "center",
-    color: "#007AFF",
+    color: "#6A6259",
+    fontSize: 13,
+  },
+
+  linkStrong: {
+    color: NAVY,
+    fontWeight: "700",
   },
 });
-
-export default SignupScreen;

@@ -1,71 +1,136 @@
 // components/BookItem.tsx
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import type { Book } from "../context/CartContext";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+
+type Book = {
+  id: string;
+  author: string;
+  isbn: string;
+  price: number;
+  publisher: string;
+  remaining_quantity: number;
+  title: string;
+};
 
 type Props = {
   book: Book;
   onPress: () => void;
   onAddToCart: () => void;
+  primaryColor?: string; // รับสีจาก HomeScreen
 };
 
-const BookItem: React.FC<Props> = ({ book, onPress, onAddToCart }) => {
+const BookItem: React.FC<Props> = ({
+  book,
+  onPress,
+  onAddToCart,
+  primaryColor = "#1C3D6E",
+}) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.info}>
-        <Text style={styles.title}>{book.title}</Text>
-        <Text style={styles.meta}>
-          {book.author} • {book.publisher}
+        <Text style={styles.title} numberOfLines={2}>
+          {book.title}
         </Text>
-        <Text style={styles.meta}>ISBN: {book.isbn}</Text>
-        <Text style={styles.price}>{book.price} THB</Text>
+        <Text style={styles.author} numberOfLines={1}>
+          {book.author || "Unknown author"}
+        </Text>
+        <Text style={styles.publisher} numberOfLines={1}>
+          {book.publisher}
+        </Text>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.price}>{book.price.toFixed(0)} ฿</Text>
+          <Text style={styles.stock}>
+            {book.remaining_quantity > 0
+              ? `${book.remaining_quantity} in stock`
+              : "Out of stock"}
+          </Text>
+        </View>
       </View>
-      <TouchableOpacity style={styles.addButton} onPress={onAddToCart}>
-        <Text style={styles.addText}>Add</Text>
-      </TouchableOpacity>
+
+      <View style={styles.rightColumn}>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: primaryColor }]}
+          onPress={onAddToCart}
+          activeOpacity={0.9}
+        >
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 12,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+  card: {
+    marginHorizontal: 20,
+    marginVertical: 8,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
     flexDirection: "row",
     justifyContent: "space-between",
-    elevation: 2,
+    alignItems: "center",
+
+    // soft shadow แบบ reference
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
+
   info: {
-    flexShrink: 1,
-    paddingRight: 10,
+    flex: 1,
+    paddingRight: 12,
   },
+
   title: {
-    fontWeight: "600",
-    fontSize: 16,
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1C3D6E",
   },
-  meta: {
-    color: "#666",
+  author: {
     fontSize: 12,
+    color: "#6A6259",
+    marginTop: 2,
+  },
+  publisher: {
+    fontSize: 11,
+    color: "#A39789",
+    marginTop: 2,
+  },
+
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
   },
   price: {
-    marginTop: 6,
-    fontWeight: "600",
-    color: "#2a7",
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#4A443E",
+    marginRight: 10,
   },
+  stock: {
+    fontSize: 11,
+    color: "#9A8E82",
+  },
+
+  rightColumn: {
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+
   addButton: {
-    alignSelf: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: "#007AFF",
-    borderRadius: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 999,
   },
-  addText: {
-    color: "#fff",
-    fontWeight: "600",
+  addButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 13,
   },
 });
 

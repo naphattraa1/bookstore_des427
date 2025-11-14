@@ -4,8 +4,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -32,6 +33,9 @@ type Book = {
   title: string;
 };
 
+const NAVY = "#1C3D6E";
+const CREAM = "#F7F2E8";
+
 // ----- component -----
 const BookDetailScreen: React.FC<Props> = ({ route }) => {
   const { bookId } = route.params;
@@ -43,8 +47,8 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
   useEffect(() => {
     const loadBook = async () => {
       try {
-        const allBooks = await fetchBooks();        // ✅ load from Firebase
-        const found = allBooks.find((b) => b.id === bookId);
+        const allBooks = await fetchBooks(); // ✅ load from Firebase
+        const found = allBooks.find((b: any) => b.id === bookId);
         setBook(found || null);
       } catch (e) {
         console.error("Error loading book detail:", e);
@@ -60,7 +64,7 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={NAVY} />
       </View>
     );
   }
@@ -75,61 +79,221 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{book.title}</Text>
+      {/* Scrollable content */}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Hero card */}
+        <View style={styles.heroCard}>
+          <Text style={styles.title}>{book.title}</Text>
+          <Text style={styles.author}>{book.author}</Text>
+          <Text style={styles.publisher}>{book.publisher}</Text>
 
-      <Text style={styles.label}>Author:</Text>
-      <Text style={styles.value}>{book.author}</Text>
+          <View style={styles.badgeRow}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeLabel}>ISBN</Text>
+              <Text style={styles.badgeValue}>{book.isbn}</Text>
+            </View>
+            <View style={styles.badge}>
+              <Text style={styles.badgeLabel}>In stock</Text>
+              <Text style={styles.badgeValue}>
+                {book.remaining_quantity} pcs
+              </Text>
+            </View>
+          </View>
+        </View>
 
-      <Text style={styles.label}>Publisher:</Text>
-      <Text style={styles.value}>{book.publisher}</Text>
+        {/* Info section */}
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Book information</Text>
 
-      <Text style={styles.label}>ISBN:</Text>
-      <Text style={styles.value}>{book.isbn}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Author</Text>
+            <Text style={styles.infoValue}>{book.author || "-"}</Text>
+          </View>
 
-      <Text style={styles.label}>Price:</Text>
-      <Text style={styles.value}>{book.price} THB</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Publisher</Text>
+            <Text style={styles.infoValue}>{book.publisher || "-"}</Text>
+          </View>
 
-      <Text style={styles.label}>In stock:</Text>
-      <Text style={styles.value}>{book.remaining_quantity}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>ISBN</Text>
+            <Text style={styles.infoValue}>{book.isbn || "-"}</Text>
+          </View>
 
-      <View style={styles.buttonRow}>
-        <Button title="Add to cart" onPress={() => addToCart(book)} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Stock remaining</Text>
+            <Text style={styles.infoValue}>{book.remaining_quantity}</Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Bottom bar: price + add button */}
+      <View style={styles.bottomBar}>
+        <View>
+          <Text style={styles.priceLabel}>Price</Text>
+          <Text style={styles.priceValue}>{book.price} THB</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => addToCart(book)}
+        >
+          <Text style={styles.addButtonText}>Add to cart</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
+// ----- styles -----
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: CREAM,
   },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 28,
+    paddingBottom: 120, // เว้นที่ให้ bottom bar
+  },
+
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: CREAM,
   },
   notFound: {
     fontSize: 18,
     fontWeight: "600",
-    color: "red",
+    color: NAVY,
+  },
+
+  // hero
+  heroCard: {
+    backgroundColor: "#FFF6ED",
+    padding: 20,
+    borderRadius: 24,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
-    marginBottom: 16,
+    color: NAVY,
+    marginBottom: 6,
   },
-  label: {
+  author: {
     fontSize: 14,
+    color: "#6A6259",
+  },
+  publisher: {
+    fontSize: 13,
+    color: "#8A7C6E",
+    marginTop: 2,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    marginTop: 16,
+  },
+  badge: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "#E3EAF6",
+    borderRadius: 14,
+    marginRight: 8,
+  },
+  badgeLabel: {
+    fontSize: 10,
+    color: "#5A6A88",
+  },
+  badgeValue: {
+    fontSize: 12,
     fontWeight: "600",
-    marginTop: 8,
+    color: NAVY,
+    marginTop: 2,
   },
-  value: {
+
+  // info
+  infoCard: {
+    backgroundColor: "#FFFFFF",
+    padding: 18,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.03,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  infoTitle: {
     fontSize: 16,
+    fontWeight: "700",
+    color: NAVY,
+    marginBottom: 10,
   },
-  buttonRow: {
-    marginTop: 24,
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+  },
+  infoLabel: {
+    fontSize: 13,
+    color: "#7C7267",
+  },
+  infoValue: {
+    fontSize: 13,
+    color: "#2C2620",
+    maxWidth: "60%",
+    textAlign: "right",
+  },
+
+  // bottom bar
+  bottomBar: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    backgroundColor: CREAM,
+    borderTopWidth: 1,
+    borderColor: "#E1D7C9",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: "#8A7C6E",
+  },
+  priceValue: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: NAVY,
+  },
+  addButton: {
+    marginLeft: 16,
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 999,
+    backgroundColor: NAVY,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });
 
