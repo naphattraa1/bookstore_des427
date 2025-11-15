@@ -14,6 +14,7 @@ import type { RootStackParamList } from "../App";
 import { fetchBooks } from "../utils/mockBooks50";
 import { useCart } from "../context/CartContext";
 import { Image } from "react-native";
+import { updateBookQuantity } from "../utils/updateBookQuantity";
 
 // ----- types -----
 type BookDetailRouteProp = RouteProp<RootStackParamList, "BookDetail">;
@@ -62,6 +63,23 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
 
     loadBook();
   }, [bookId]);
+
+  const onAddToCart = async () => {
+  if (book && book.remaining_quantity > 0) {
+    const newQuantity = book.remaining_quantity - 1;
+
+    // Update the quantity in Firebase
+    await updateBookQuantity(book.id, newQuantity);
+
+    // Update the local state
+    setBook({ ...book, remaining_quantity: newQuantity });
+
+    // Add the book to the cart
+    addToCart(book);
+    } else {
+      alert("This book is out of stock!");
+    }
+  };
 
   if (loading) {
     return (
