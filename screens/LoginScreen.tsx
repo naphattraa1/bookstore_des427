@@ -10,6 +10,9 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../App";
+import { database } from "../firebase/firebase";
+import { ref, get } from "firebase/database";
+
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -31,6 +34,36 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const onLogin = () => {
     navigation.replace("Home");
   };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+
+    try {
+      const usersRef = ref(database, "users");
+      const snapshot = await get(usersRef);
+
+      if (snapshot.exists()) {
+        const usersObj = snapshot.val();
+        const users = Object.values(usersObj) as any[];
+        const found = users.find(u => u.email === email.trim() && u.password === password);
+
+        if (found) {
+          navigation.navigate("Home"); // เดิมของคุณไปหน้า Home
+        } else {
+          alert("Invalid email or password");
+        }
+      } else {
+        alert("No users found. Please sign up.");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Login failed");
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -62,7 +95,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             onChangeText={setPassword}
           />
 
-          <TouchableOpacity style={styles.loginButton} onPress={onLogin}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
 

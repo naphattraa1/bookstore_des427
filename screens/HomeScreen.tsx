@@ -32,6 +32,7 @@ type Book = {
 
 type Props = {
   navigation: HomeScreenNavigationProp;
+  route: any;
 };
 
 type CategoryKey = "all" | "budget" | "premium";
@@ -43,7 +44,7 @@ const CATEGORIES: { key: CategoryKey; label: string }[] = [
 ];
 
 // ---------- Component ----------
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
+const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { addToCart, totalItems } = useCart();
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState<Book[]>([]);
@@ -51,6 +52,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
 
   useEffect(() => {
+    
     const loadBooks = async () => {
       try {
         setLoading(true);
@@ -72,8 +74,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       }
     };
 
-    loadBooks();
+    if (books.length === 0) {
+      loadBooks();
+    }
   }, []);
+
+  useEffect(() => {
+    if (route.params?.updatedBooks) {
+      setBooks(route.params.updatedBooks);
+    }
+  }, [route.params?.updatedBooks]);
 
   const filteredBooks = useMemo(() => {
     const q = query.toLowerCase();

@@ -2,7 +2,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
-// เอา config ที่น้องมีมาใส่ตรงนี้
+// เอา config ที่มีมาใส่ตรงนี้
 const firebaseConfig = {
   apiKey: "AIzaSyCDm_zmY3ILrtfAWHozT1msq-u1lVNISYs",
   authDomain: "book-store-efdd9.firebaseapp.com",

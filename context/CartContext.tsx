@@ -13,6 +13,7 @@ import React, {
     publisher: string;
     isbn: string;
     price: number;
+    image?: string;
   };
   
   export type CartItem = Book & {

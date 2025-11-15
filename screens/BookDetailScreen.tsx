@@ -13,6 +13,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
 import { fetchBooks } from "../utils/mockBooks50";
 import { useCart } from "../context/CartContext";
+import { Image } from "react-native";
 
 // ----- types -----
 type BookDetailRouteProp = RouteProp<RootStackParamList, "BookDetail">;
@@ -31,6 +32,7 @@ type Book = {
   publisher: string;
   remaining_quantity: number;
   title: string;
+  image?: string;
 };
 
 const NAVY = "#1C3D6E";
@@ -128,6 +130,23 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
             <Text style={styles.infoLabel}>Stock remaining</Text>
             <Text style={styles.infoValue}>{book.remaining_quantity}</Text>
           </View>
+
+          {(
+            <Image
+              source={{
+                uri: book.image ?? `https://loremflickr.com/300/400/book,novel?lock=${book.id}`,
+              }}
+              style={{
+                width: 180,
+                height: 260,
+                alignSelf: "center",
+                marginTop: 20,
+                borderRadius: 12,
+              }}
+              resizeMode="cover"
+            />
+          )}
+
         </View>
       </ScrollView>
 

@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../App";
+import { database } from "../firebase/firebase";
+import { ref, push, set } from "firebase/database";
 
 type SignupScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -29,7 +31,24 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
   const onSignup = () => {
     navigation.replace("Login");
   };
+  
+  const handleSignup = async () => {
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
 
+    try {
+      const usersRef = ref(database, "users");
+      const newUserRef = push(usersRef);
+      await set(newUserRef, { email: email.trim(), password }); // plain text as requested
+      alert("Signup success. Please login.");
+      navigation.navigate("Login"); // ถ้าหน้าชื่ออื่น ปรับชื่อได้
+    } catch (err) {
+      console.error("Signup error:", err);
+      alert("Signup failed");
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.innerWrapper}>
@@ -60,7 +79,7 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
             onChangeText={setPassword}
           />
 
-          <TouchableOpacity style={styles.signupButton} onPress={onSignup}>
+          <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
             <Text style={styles.signupText}>Sign Up</Text>
           </TouchableOpacity>
 
