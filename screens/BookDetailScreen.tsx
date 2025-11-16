@@ -65,21 +65,26 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
   }, [bookId]);
 
   const onAddToCart = async () => {
-  if (book && book.remaining_quantity > 0) {
-    const newQuantity = book.remaining_quantity - 1;
+    console.log("onAddToCart triggered");
+    if (book && book.remaining_quantity > 0) {
+      const newQuantity = book.remaining_quantity - 1;
 
-    // Update the quantity in Firebase
-    await updateBookQuantity(book.id, newQuantity);
+      console.log("Updating book quantity...");
+      console.log("Book ID:", book.id);
+      console.log("New Quantity:", newQuantity);
 
-    // Update the local state
-    setBook({ ...book, remaining_quantity: newQuantity });
+      // Update the quantity in Firebase
+      await updateBookQuantity(book.id, newQuantity);
 
-    // Add the book to the cart
-    addToCart(book);
+      // Update the local state
+      setBook({ ...book, remaining_quantity: newQuantity });
+
+      // Add the book to the cart
+      addToCart(book);
     } else {
       alert("This book is out of stock!");
     }
-  };
+};
 
   if (loading) {
     return (
@@ -177,7 +182,7 @@ const BookDetailScreen: React.FC<Props> = ({ route }) => {
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => addToCart(book)}
+          onPress={onAddToCart}
         >
           <Text style={styles.addButtonText}>Add to cart</Text>
         </TouchableOpacity>

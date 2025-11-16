@@ -1,6 +1,7 @@
 // components/BookItem.tsx
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { updateBookQuantity } from "../utils/updateBookQuantity";
 
 type Book = {
   id: string;
@@ -51,7 +52,7 @@ const BookItem: React.FC<Props> = ({
       <View style={styles.rightColumn}>
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: primaryColor }]}
-          onPress={onAddToCart}
+          onPress={ onAddToCart }
           activeOpacity={0.9}
         >
           <Text style={styles.addButtonText}>Add</Text>
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
 
-    // soft shadow แบบ reference
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 10,

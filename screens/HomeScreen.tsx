@@ -9,10 +9,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useFocusEffect } from "@react-navigation/native";
 import type { RootStackParamList } from "../App";
 import { fetchBooks } from "../utils/mockBooks50";
 import BookItem from "../components/BookItem";
 import { useCart } from "../context/CartContext";
+import { updateBookQuantity } from "../utils/updateBookQuantity";
 
 // ---------- Types ----------
 type HomeScreenNavigationProp = StackNavigationProp<
@@ -52,7 +54,6 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
 
   useEffect(() => {
-    
     const loadBooks = async () => {
       try {
         setLoading(true);
@@ -73,7 +74,7 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setLoading(false);
       }
     };
-
+    
     if (books.length === 0) {
       loadBooks();
     }
@@ -222,7 +223,10 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
               onPress={() =>
                 navigation.navigate("BookDetail", { bookId: item.id })
               }
-              onAddToCart={() => addToCart(item)}
+              onAddToCart={() => {
+                addToCart(item);
+                updateBookQuantity(item.id, item.remaining_quantity - 1);
+              }}
             />
           )}
           ListHeaderComponent={renderHeader}

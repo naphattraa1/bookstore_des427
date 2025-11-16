@@ -1,16 +1,37 @@
 import { database } from "../firebase/firebase";
-import { ref, update } from "firebase/database";
+import { ref, get, child, update } from "firebase/database";
 
-/**
- * Updates the remaining quantity of a book in Firebase.
- * @param bookId - The ID of the book to update.
- * @param newQuantity - The new remaining quantity.
- */
-export const updateBookQuantity = async (bookId: string, newQuantity: number): Promise<void> => {
+export const updateBookQuantity = async (id: string, newQuantity: number): Promise<void> => {
   try {
-    const bookRef = ref(database, `books/${bookId}`);
+    const booksRef = ref(database, "books");
+    // Get all books
+    const snapshot = await get(booksRef);
+
+    if (!snapshot.exists()) {
+      console.error("No books found");
+      return;
+    }
+
+    let targetKey = null;
+
+    // Find the key where item.id === id
+    snapshot.forEach((childSnapshot) => {
+      const data = childSnapshot.val();
+      if (data.id === id) {
+        targetKey = childSnapshot.key;
+      }
+    });
+
+    if (!targetKey) {
+      console.error("Book with that id not found");
+      return;
+    }
+
+    // Now update the correct path
+    const bookRef = ref(database, `books/${targetKey}`);
     await update(bookRef, { remaining_quantity: newQuantity });
-    console.log(`Book ${bookId} updated with new quantity: ${newQuantity}`);
+
+    console.log(`Updated: books/${targetKey} → remaining_quantity = ${newQuantity}`);
   } catch (error) {
     console.error("Error updating book quantity:", error);
   }
